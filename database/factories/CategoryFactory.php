@@ -22,7 +22,8 @@ class CategoryFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'name' => $this->faker->colorName,
+            'description' => rand(1, 10) % 2 == 0 ? $this->faker->sentence() : null,
         ];
     }
 }
