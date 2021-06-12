@@ -14,6 +14,7 @@ services:
       - _DB_DATABASE=code_micro_videos
       - _DB_USERNAME=root
       - _DB_PASSWORD=root
+      - _TEST_DB_DATABASE=code_micro_videos_test
     volumes:
       - .:/var/www
     networks:
@@ -45,6 +46,7 @@ services:
       - "33006:3306"
     volumes:
       - ./.docker/dbdata:/var/lib/mysql
+      - ./.docker/mysql:/docker-entrypoint-initdb.d
     environment:
       - MYSQL_DATABASE=code_micro_videos
       - MYSQL_ROOT_PASSWORD=root
