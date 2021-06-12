@@ -15,4 +15,7 @@ class Category extends Model
     protected $data = ["deleted_at"];
     public $incrementing = false;
     protected $keyType = 'string';
+    protected $casts = [
+        'id' => 'string'
+    ];
 }
