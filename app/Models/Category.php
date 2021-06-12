@@ -12,7 +12,7 @@ class Category extends Model
     use HasFactory, SoftDeletes, Uuid;
 
     protected $fillable = ['name', 'description', 'is_active'];
-    protected $data = ["deleted_at"];
+    protected $dates = ['deleted_at'];
     public $incrementing = false;
     protected $keyType = 'string';
     protected $casts = [

@@ -12,7 +12,7 @@ class Genre extends Model
     use HasFactory, SoftDeletes, Uuid;
 
     protected $fillable = ['name', 'is_active'];
-    protected $data = ["deleted_at"];
+    protected $dates = ['deleted_at'];
     public $incrementing = false;
     protected $keyType = 'string';
 }
