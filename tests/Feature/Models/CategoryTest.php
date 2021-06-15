@@ -58,7 +58,9 @@ class CategoryTest extends TestCase
             'name' => 'test1',
             'is_active' => true
         ]);
+
         $this->assertTrue($category->is_active);
+        $this->assertMatchesRegularExpression('/[a-f0-9]{8}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{4}-[a-f0-9]{12}/', $category->id);
     }
 
     public function testUpdate()

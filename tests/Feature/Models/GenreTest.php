@@ -46,6 +46,7 @@ class GenreTest extends TestCase
             'is_active' => true
         ]);
         $this->assertTrue($genre->is_active);
+        $this->assertMatchesRegularExpression('/[a-f0-9]{8}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{4}-[a-f0-9]{12}/', $genre->id);
     }
 
     public function testUpdate()
