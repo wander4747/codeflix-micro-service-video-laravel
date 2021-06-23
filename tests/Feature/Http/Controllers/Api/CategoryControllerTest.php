@@ -98,7 +98,6 @@ class CategoryControllerTest extends TestCase
             $data,
             array_merge($data, ['description' => null]));
 
-
         $data = [
             'name' => 'test update',
             'is_active' => true,
