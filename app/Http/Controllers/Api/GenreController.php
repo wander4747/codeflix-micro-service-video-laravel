@@ -2,39 +2,28 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\GenreRequest;
 use App\Models\Genre;
 
-class GenreController extends Controller
+class GenreController extends BasicCrudController
 {
 
-    public function index()
+    private $rules = [
+        'name' => 'required|max:255',
+        'is_active' => 'boolean'
+    ];
+
+    protected function model()
     {
-        return Genre::all();
+        return Genre::class;
     }
 
-    public function store(GenreRequest $request)
+    protected function rulesStore()
     {
-        $genre = Genre::create($request->all());
-        $genre->refresh();
-        return $genre;
+        return $this->rules;
     }
 
-    public function show(Genre $genre)
+    protected function rulesUpdate()
     {
-        return $genre;
-    }
-
-    public function update(GenreRequest $request, Genre $genre)
-    {
-        $genre->update($request->all());
-        return $genre;
-    }
-
-    public function destroy(Genre $genre)
-    {
-        $genre->delete();
-        return response()->noContent();
+        return $this->rules;
     }
 }
