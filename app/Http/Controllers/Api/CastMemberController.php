@@ -5,81 +5,32 @@ namespace App\Http\Controllers\Api;
 use App\Models\CastMember;
 use Illuminate\Http\Request;
 
-class CastMemberController extends Controller
+class CastMemberController extends BasicCrudController
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+
+    private $rules;
+
+    public function __construct()
     {
-        //
+        $this->rules = [
+            'name' => 'required|max:255',
+            'type' => 'required|in:' . implode(',', CastMember::typeCastMember())
+        ];
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    protected function model()
     {
-        //
+        return CastMember::class;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    protected function rulesStore()
     {
-        //
+        return $this->rules;
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\CastMember  $castMember
-     * @return \Illuminate\Http\Response
-     */
-    public function show(CastMember $castMember)
+    protected function rulesUpdate()
     {
-        //
+        return $this->rules;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\CastMember  $castMember
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(CastMember $castMember)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\CastMember  $castMember
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, CastMember $castMember)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\CastMember  $castMember
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(CastMember $castMember)
-    {
-        //
-    }
 }
