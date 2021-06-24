@@ -12,9 +12,9 @@ jobs:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_USER: root
           MYSQL_PASSWORD: root
+          MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: code_micro_videos_test
         ports:
           - 3306:3306
@@ -35,8 +35,8 @@ jobs:
       - name: Generate Key
         run: php artisan key:generate
 
-      - name: Migrate the Database
+      - name: Migrate database
         run: php artisan migrate
 
-      - name: Run Testsuite
+      - name: Run Testsuite against MySQL
         run: vendor/bin/phpunit
