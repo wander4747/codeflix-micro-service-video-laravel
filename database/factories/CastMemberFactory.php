@@ -21,9 +21,10 @@ class CastMemberFactory extends Factory
      */
     public function definition()
     {
+        $types = CastMember::typeCastMember();
         return [
             'name' => $this->faker->name(),
-            'type' => array_rand(CastMember::typeCastMember())
+            'type' => $types[array_rand($types)]
         ];
     }
 }
