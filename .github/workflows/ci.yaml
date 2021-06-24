@@ -8,6 +8,18 @@ jobs:
     container:
       image: kirschbaumdevelopment/laravel-test-runner:7.3
 
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_USER: root
+          MYSQL_PASSWORD: root
+          MYSQL_DATABASE: code_micro_videos_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
       - uses: actions/checkout@v2
 
@@ -23,5 +35,8 @@ jobs:
       - name: Generate Key
         run: php artisan key:generate
 
+      - name: Migrate the Database
+        run: php artisan migrate
+
       - name: Run Testsuite
-        run: vendor/bin/phpunit  tests/Unit/Model/CategoryTest.php
+        run: vendor/bin/phpunit
