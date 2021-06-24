@@ -4,23 +4,21 @@ on: [push]
 
 jobs:
   build-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     container:
       image: kirschbaumdevelopment/laravel-test-runner:7.3
 
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_USER: root
-          MYSQL_PASSWORD: root
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: code_micro_videos_test
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    env:
+      DB_DATABASE: code_micro_videos_test
+      DB_USER: root
+      DB_PASSWORD: root
 
     steps:
+      - name: Set up MySQL
+        run: |
+          sudo /etc/init.d/mysql start
+          mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
+          
       - uses: actions/checkout@v2
 
       - name: Install composer dependencies
