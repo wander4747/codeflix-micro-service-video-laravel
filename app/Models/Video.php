@@ -36,4 +36,9 @@ class Video extends Model
     ];
 
     public $incrementing = false;
+
+    public  static function ratingList()
+    {
+        return self::RATING_LIST;
+    }
 }

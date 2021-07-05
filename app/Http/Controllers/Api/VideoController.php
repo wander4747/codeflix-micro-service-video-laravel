@@ -8,6 +8,20 @@ use Illuminate\Http\Request;
 class VideoController extends BasicCrudController
 {
 
+    private $rules;
+
+    public function __construct()
+    {
+        $this->rules = [
+            'title' => 'required|max:255',
+            'description' => 'required',
+            'year_launched' => 'required|date_format:Y',
+            'opened' => 'boolean',
+            'rating' => 'required|in:' . implode(',', Video::ratingList()),
+            'duration' => 'required|integer',
+        ];
+    }
+
     protected function model()
     {
         return Video::class;
@@ -15,11 +29,11 @@ class VideoController extends BasicCrudController
 
     protected function rulesStore()
     {
-        // TODO: Implement rulesStore() method.
+        return $this->rules;
     }
 
     protected function rulesUpdate()
     {
-        // TODO: Implement rulesUpdate() method.
+        return $this->rules;
     }
 }
