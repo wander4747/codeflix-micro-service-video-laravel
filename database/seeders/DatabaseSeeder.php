@@ -17,5 +17,6 @@ class DatabaseSeeder extends Seeder
         \App\Models\Category::factory(100)->create();
         \App\Models\Genre::factory(100)->create();
         \App\Models\CastMember::factory(100)->create();
+        \App\Models\Video::factory(100)->create();
     }
 }

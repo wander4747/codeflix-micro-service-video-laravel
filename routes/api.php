@@ -23,6 +23,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Api'], function() {
     Route::resource("categories", "CategoryController", $excepts);
     Route::resource("genres", "GenreController", $excepts);
     Route::resource("cast_members", "CastMemberController", $excepts);
+    Route::resource("videos", "VideoController", $excepts);
 });
 
 
