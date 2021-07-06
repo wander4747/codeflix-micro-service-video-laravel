@@ -4,18 +4,20 @@
 namespace Feature\Http\Controllers\Api;
 
 
+use App\Http\Controllers\Api\VideoController;
 use App\Models\Category;
 use App\Models\Genre;
 use App\Models\Video;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use Tests\Traits\TestRelations;
 use Tests\Traits\TestSaves;
 use Tests\Traits\TestValidations;
 
 class VideoControllerTest extends TestCase
 {
 
-    use DatabaseMigrations, TestValidations, TestSaves;
+    use DatabaseMigrations, TestValidations, TestSaves, TestRelations;
 
     private $video;
     private $category;
@@ -28,6 +30,7 @@ class VideoControllerTest extends TestCase
         $this->video = Video::factory()->create();
         $this->category = Category::factory()->create();
         $this->genre = Genre::factory()->create();
+        $this->genre->categories()->sync($this->category);
         $this->sendData = [
             'title' => 'title',
             'description' => 'description',
@@ -143,17 +146,26 @@ class VideoControllerTest extends TestCase
         $this->assertInvalidationUpdateAction($data, 'exists');
     }
 
-//    public function testStore()
-//    {
-//        $response = $this->assertStore($this->sendData, $this->sendData + ['deleted_at' => null]);
-//        $response->assertJsonStructure(['created_at', 'updated_at']);
-//    }
-//
-//    public function testUpdate()
-//    {
-//        $response = $this->assertUpdate($this->sendData + ['opened' => true], $this->sendData + ['opened' => true]);
-//        $response->assertJsonStructure(['created_at', 'updated_at']);
-//    }
+    public function testStore()
+    {
+        $response = $this->assertStore($this->sendData + [
+            'categories_id' => [$this->category->id], 'genres_id' => [$this->genre->id]
+            ], $this->sendData + ['deleted_at' => null]);
+        $response->assertJsonStructure(['created_at', 'updated_at']);
+
+        $this->assertDatabaseHasRelation('category_video',
+            ['video_id' => $response->json('id'), 'category_id' => $this->category->id]);
+    }
+
+    public function testUpdate()
+    {
+        $response = $this->assertUpdate($this->sendData +
+            ['opened' => true, 'categories_id' => [$this->category->id], 'genres_id' => [$this->genre->id]],
+            $this->sendData + ['opened' => true]);
+        $response->assertJsonStructure(['created_at', 'updated_at']);
+        $this->assertDatabaseHasRelation('genre_video',
+            ['video_id' => $response->json('id'), 'genre_id' => $this->genre->id]);
+    }
 
     public function testDestroy()
     {
