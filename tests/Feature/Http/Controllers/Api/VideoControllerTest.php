@@ -4,6 +4,8 @@
 namespace Feature\Http\Controllers\Api;
 
 
+use App\Models\Category;
+use App\Models\Genre;
 use App\Models\Video;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -16,18 +18,22 @@ class VideoControllerTest extends TestCase
     use DatabaseMigrations, TestValidations, TestSaves;
 
     private $video;
+    private $category;
+    private $genre;
     private $sendData;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->video = Video::factory()->create();
+        $this->category = Category::factory()->create();
+        $this->genre = Genre::factory()->create();
         $this->sendData = [
             'title' => 'title',
             'description' => 'description',
             'year_launched' => 2021,
             'rating' => 'L',
-            'duration' => 10
+            'duration' => 10,
         ];
     }
 
@@ -55,6 +61,8 @@ class VideoControllerTest extends TestCase
             'year_launched' => '',
             'rating' => '',
             'duration' => '',
+            'categories_id' => '',
+            'genres_id' => '',
         ];
         $this->assertInvalidationStoreAction($data, 'required');
         $this->assertInvalidationUpdateAction($data, 'required');
@@ -105,17 +113,47 @@ class VideoControllerTest extends TestCase
         $this->assertInvalidationUpdateAction($data, 'in');
     }
 
-    public function testStore()
+    public function testInvalidationCategoriesIdField()
     {
-        $response = $this->assertStore($this->sendData, $this->sendData + ['deleted_at' => null]);
-        $response->assertJsonStructure(['created_at', 'updated_at']);
+        $data = [
+            'categories_id' => 'a'
+        ];
+        $this->assertInvalidationStoreAction($data, 'array');
+        $this->assertInvalidationUpdateAction($data, 'array');
+
+        $data = [
+            'categories_id' => [100]
+        ];
+        $this->assertInvalidationStoreAction($data, 'exists');
+        $this->assertInvalidationUpdateAction($data, 'exists');
     }
 
-    public function testUpdate()
+    public function testInvalidationGenresIdField()
     {
-        $response = $this->assertUpdate($this->sendData + ['opened' => true], $this->sendData + ['opened' => true]);
-        $response->assertJsonStructure(['created_at', 'updated_at']);
+        $data = [
+            'genres_id' => 'a'
+        ];
+        $this->assertInvalidationStoreAction($data, 'array');
+        $this->assertInvalidationUpdateAction($data, 'array');
+
+        $data = [
+            'genres_id' => [100]
+        ];
+        $this->assertInvalidationStoreAction($data, 'exists');
+        $this->assertInvalidationUpdateAction($data, 'exists');
     }
+
+//    public function testStore()
+//    {
+//        $response = $this->assertStore($this->sendData, $this->sendData + ['deleted_at' => null]);
+//        $response->assertJsonStructure(['created_at', 'updated_at']);
+//    }
+//
+//    public function testUpdate()
+//    {
+//        $response = $this->assertUpdate($this->sendData + ['opened' => true], $this->sendData + ['opened' => true]);
+//        $response->assertJsonStructure(['created_at', 'updated_at']);
+//    }
 
     public function testDestroy()
     {
