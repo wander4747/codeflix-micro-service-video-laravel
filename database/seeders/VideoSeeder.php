@@ -13,6 +13,6 @@ class VideoSeeder extends Seeder
      */
     public function run()
     {
-        //
+        \App\Models\Video::factory(100)->create();
     }
 }
