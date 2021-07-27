@@ -5,6 +5,7 @@ namespace Unit\Model;
 
 
 use App\Models\Video;
+use App\Traits\UploadFiles;
 use App\Traits\Uuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -54,6 +55,7 @@ class VideoTest  extends TestCase
             HasFactory::class,
             SoftDeletes::class,
             Uuid::class,
+            UploadFiles::class
         ];
         $videoTraits = array_keys(class_uses(Video::class));
         $this->assertEquals($traits, $videoTraits);
