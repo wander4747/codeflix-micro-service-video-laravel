@@ -35,6 +35,11 @@ return [
             'root' => storage_path('app'),
         ],
 
+        'video_local' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/videos'),
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
@@ -52,7 +57,6 @@ return [
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
         ],
-
     ],
 
     /*
