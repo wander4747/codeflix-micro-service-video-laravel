@@ -8,7 +8,6 @@ use App\Models\Category;
 use App\Models\Genre;
 use App\Models\Video;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 use Tests\Traits\{TestRelations, TestSaves, TestValidations, TestUploads};
 
