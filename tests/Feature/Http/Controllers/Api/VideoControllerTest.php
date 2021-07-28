@@ -4,20 +4,18 @@
 namespace Feature\Http\Controllers\Api;
 
 
-use App\Http\Controllers\Api\VideoController;
 use App\Models\Category;
 use App\Models\Genre;
 use App\Models\Video;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
-use Tests\Traits\TestRelations;
-use Tests\Traits\TestSaves;
-use Tests\Traits\TestValidations;
+use Tests\Traits\{TestRelations, TestSaves, TestValidations, TestUploads};
 
 class VideoControllerTest extends TestCase
 {
 
-    use DatabaseMigrations, TestValidations, TestSaves, TestRelations;
+    use DatabaseMigrations, TestValidations, TestSaves, TestRelations, TestUploads;
 
     private $video;
     private $category;
@@ -174,6 +172,16 @@ class VideoControllerTest extends TestCase
         );
         $response->assertStatus(204);
         $this->assertNull(Video::find($this->video->id));
+    }
+
+    public function testInvalidationVideoField()
+    {
+        $this->assertInvalidationFile(
+            'video_file',
+            'mp4',
+            '50',
+            'mimetypes', ['values' => 'video/mp4']
+        );
     }
 
     protected function routeStore()
