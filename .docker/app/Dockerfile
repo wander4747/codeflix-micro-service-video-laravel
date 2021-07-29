@@ -1,7 +1,16 @@
 FROM php:7.3.6-fpm-alpine3.9
 
-RUN apk add --no-cache shadow openssl bash mysql-client nodejs npm git
+RUN apk add --no-cache openssl \
+            bash \
+            mysql-client \
+            nodejs \
+            npm \
+            freetype-dev \
+            libjpeg-turbo-dev \
+            libpng-dev
 RUN docker-php-ext-install pdo pdo_mysql
+RUN docker-php-ext-configure gd --with-gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/
+RUN docker-php-ext-install -j$(nproc) gd
 
 RUN touch /home/www-data/.bashrc | echo "PS1='\w\$ '" >> /home/www-data/.bashrc
 
@@ -11,8 +20,6 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
     && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-RUN usermod -u 1000 www-data
 
 WORKDIR /var/www
 
