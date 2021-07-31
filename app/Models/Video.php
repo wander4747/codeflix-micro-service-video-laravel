@@ -52,6 +52,9 @@ class Video extends Model
             \DB::commit();
             return $obj;
         } catch (\Exception $e) {
+            if (isset($obj)) {
+                $obj->deleteFiles($files);
+            }
             \DB::rollBack();
             throw $e;
         }

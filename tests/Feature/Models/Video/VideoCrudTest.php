@@ -11,6 +11,16 @@ use App\Models\Video;
 class VideoCrudTest extends BaseVideoTest
 {
 
+    private $fileFieldsData = [];
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        foreach (Video::$fileFields as $field) {
+            $this->fileFieldsData[$field] = "$field.test";
+        }
+    }
+
     public function testList()
     {
         Video::factory(1)->create();
