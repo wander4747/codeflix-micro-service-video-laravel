@@ -5,7 +5,7 @@ on: [push]
 jobs:
   build-test:
     runs-on: ubuntu-20.04
-    
+
     services:
       # Label used to access the service container
       mysql:
@@ -48,6 +48,11 @@ jobs:
           DB_DATABASE: laravel
           DB_PORT: 3306
           DB_USER: root
+          GOOGLE_CLOUD_PROJECT_ID: tidal-heading-319622
+          GOOGLE_CLOUD_KEY_FILE: service-account-storage.json
+          GOOGLE_CLOUD_STORAGE_BUCKET: code-micro-videos-w
+          GOOGLE_CLOUD_STORAGE_API_URI: https://storage.cloud.google.com/code-micro-videos-w
+          TESTING_PROD: true
 
       - name: Migrate database
         run: php artisan migrate
