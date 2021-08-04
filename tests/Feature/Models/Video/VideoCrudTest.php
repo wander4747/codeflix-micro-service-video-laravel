@@ -87,7 +87,7 @@ class VideoCrudTest extends BaseVideoTest
         $this->assertNotNull(Video::find($video->id));
     }
 
-    public function testUpdateWithBasicFields()
+    public function testCreateWithBasicFields()
     {
         $video = Video::factory()->create( ['opened' => false]);
         $video->update($this->videoData);
@@ -95,6 +95,21 @@ class VideoCrudTest extends BaseVideoTest
         $this->assertDatabaseHas('videos',
             $this->videoData + ['opened' => false]
         );
+    }
+
+    public function testUpdateWithBasicFields()
+    {
+        $video = Video::factory()->create( ['opened' => false]);
+        $video->update($this->videoData + $this->fileFieldsData);
+        $this->assertFalse($video->opened);
+        $this->assertDatabaseHas('videos',
+            $this->videoData + $this->fileFieldsData + ['opened' => false]
+        );
+
+        $video = Video::factory()->create( ['opened' => false]);
+        $video->update($this->videoData + $this->fileFieldsData + ['opened' => true]);
+        $this->assertTrue($video->opened);
+        $this->assertDatabaseHas('videos', $this->videoData + ['opened' => true]);
     }
 
     public function testCreateWithRelations()

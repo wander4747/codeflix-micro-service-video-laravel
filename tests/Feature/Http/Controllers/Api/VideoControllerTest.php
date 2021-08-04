@@ -179,18 +179,53 @@ class VideoControllerTest extends TestCase
         $this->assertInvalidationFile(
             'video_file',
             'mp4',
-            '50',
+            Video::MAX_VIDEO_SIZE,
             'mimetypes', ['values' => 'video/mp4']
         );
     }
 
-    public function testStoreWithFiles()
+    public function testInvalidationTrailerField()
+    {
+        $this->assertInvalidationFile(
+            'trailer_file',
+            'mp4',
+            Video::MAX_TRAILER_SIZE,
+            'mimetypes', ['values' => 'video/mp4']
+        );
+    }
+
+    public function testInvalidationThumbField()
+    {
+        $this->assertInvalidationFile(
+            'thumb_file',
+            'jpg',
+            Video::MAX_THUMB_SIZE,
+            'image');
+    }
+
+    public function testInvalidationBannerField()
+    {
+        $this->assertInvalidationFile(
+            'banner_file',
+            'jpg',
+            Video::MAX_BANNER_SIZE,
+            'image'
+        );
+    }
+
+    public function testCreateWithFiles()
     {
         \Storage::fake();
-        $file = UploadedFile::fake()->create("video_file.mp4");
+        $video = UploadedFile::fake()->create("video_file.mp4");
+        $trailer = UploadedFile::fake()->create("trailer_file.mp4");
+        $banner = UploadedFile::fake()->create("banner_file.jpg");
+        $thumb = UploadedFile::fake()->create("thumb_file.jpg");
 
         $fields = [
-            'video_file' => $file,
+            'video_file' => $video,
+            'thumb_file' => $thumb,
+            'banner_file' => $banner,
+            'trailer_file' => $trailer,
             'categories_id' => [$this->category->id],
             'genres_id' => [$this->genre->id]
         ];
@@ -200,8 +235,54 @@ class VideoControllerTest extends TestCase
         $response->assertStatus(201);
 
         $id = $response->json('id');
-        \Storage::assertExists("{$id}/{$file->hashName()}");
+        \Storage::assertExists("{$id}/{$video->hashName()}");
+        \Storage::assertExists("{$id}/{$thumb->hashName()}");
+        \Storage::assertExists("{$id}/{$banner->hashName()}");
+        \Storage::assertExists("{$id}/{$trailer->hashName()}");
     }
+
+    public function testUpdateWithFiles()
+    {
+        \Storage::fake();
+        $video = UploadedFile::fake()->create("video_file.mp4");
+        $trailer = UploadedFile::fake()->create("trailer_file.mp4");
+        $banner = UploadedFile::fake()->create("banner_file.jpg");
+        $thumb = UploadedFile::fake()->create("thumb_file.jpg");
+
+        $fields = [
+            'video_file' => $video,
+            'thumb_file' => $thumb,
+            'banner_file' => $banner,
+            'trailer_file' => $trailer,
+            'categories_id' => [$this->category->id],
+            'genres_id' => [$this->genre->id]
+        ];
+
+        $response = $this->json(
+            'PUT', $this->routeUpdate(), $this->sendData + $fields
+        );
+        $response->assertStatus(200);
+
+        $fields = [
+            'thumb_file' => UploadedFile::fake()->create("thumb_file.jpg"),
+            'video_file' => UploadedFile::fake()->create("video_file.mp4"),
+            'categories_id' => [$this->category->id],
+            'genres_id' => [$this->genre->id]
+        ];
+
+        $response = $this->json(
+            'PUT', $this->routeUpdate(), $this->sendData + $fields
+        );
+
+        $response->assertStatus(200);
+
+        $id = $response->json('data.id');
+        \Storage::assertMissing("{$id}/{$video->hashName()}");
+        \Storage::assertMissing("{$id}/{$thumb->hashName()}");
+        \Storage::assertMissing("{$id}/{$banner->hashName()}");
+        \Storage::assertMissing("{$id}/{$trailer->hashName()}");
+    }
+
 
     protected function routeStore()
     {
