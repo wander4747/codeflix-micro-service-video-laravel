@@ -93,5 +93,4 @@ class VideoUploadTest extends BaseVideoTest
 
         $this->assertTrue($hasError);
     }
-
 }

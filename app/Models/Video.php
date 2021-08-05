@@ -115,4 +115,24 @@ class Video extends Model
     {
         return $this->id;
     }
+
+    public function getUrlVideoFileAttribute()
+    {
+        return $this->video_file ? $this->getFileUrl($this->video_file) : null;
+    }
+
+    public function getUrlTrailerFileAttribute()
+    {
+        return $this->trailer_file ? $this->getFileUrl($this->trailer_file) : null;
+    }
+
+    public function getUrlThumbFileAttribute()
+    {
+        return $this->thumb_file ? $this->getFileUrl($this->thumb_file) : null;
+    }
+
+    public function getUrlBannerFileAttribute()
+    {
+        return $this->banner_file ? $this->getFileUrl($this->banner_file) : null;
+    }
 }
