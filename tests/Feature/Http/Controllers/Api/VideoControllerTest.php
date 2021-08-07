@@ -4,23 +4,62 @@
 namespace Feature\Http\Controllers\Api;
 
 
+use App\Http\Resources\VideoResource;
 use App\Models\Category;
 use App\Models\Genre;
 use App\Models\Video;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
-use Tests\Traits\{TestRelations, TestSaves, TestValidations, TestUploads};
+use Tests\Traits\{TestRelations, TestResources, TestSaves, TestValidations, TestUploads};
 
 class VideoControllerTest extends TestCase
 {
 
-    use DatabaseMigrations, TestValidations, TestSaves, TestRelations, TestUploads;
+    use DatabaseMigrations, TestValidations, TestSaves, TestRelations, TestUploads, TestResources;
 
     private $video;
     private $category;
     private $genre;
     private $sendData;
+    private $serializedFields = [
+        'id',
+        'title',
+        'description',
+        'year_launched',
+        'rating',
+        'duration',
+        'rating',
+        'opened',
+        'thumb_file_url',
+        'banner_file_url',
+        'video_file_url',
+        'trailer_file_url',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'categories' => [
+            '*' => [
+                'id',
+                'name',
+                'description',
+                'is_active',
+                'created_at',
+                'updated_at',
+                'deleted_at'
+            ]
+        ],
+        'genres' => [
+            '*' => [
+                'id',
+                'name',
+                'is_active',
+                'created_at',
+                'updated_at',
+                'deleted_at',
+            ]
+        ]
+    ];
 
     protected function setUp(): void
     {
@@ -43,7 +82,19 @@ class VideoControllerTest extends TestCase
         $response = $this->get(route('videos.index'));
 
         $response->assertStatus(200)
-            ->assertJson([$this->video->toArray()]);
+            ->assertJson([
+                'meta' => ['per_page' => 15]
+            ])
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => $this->serializedFields
+                ],
+                'links' => [],
+                'meta' => [],
+            ]);
+
+        $resource = VideoResource::collection(collect([$this->video]));
+        $this->assertResource($response, $resource);
     }
 
     public function testShow()
@@ -51,7 +102,13 @@ class VideoControllerTest extends TestCase
         $response = $this->get(route('videos.show', ['video' => $this->video->id]));
 
         $response->assertStatus(200)
-            ->assertJson($this->video->toArray());
+            ->assertJsonStructure([
+                'data' => $this->serializedFields
+            ]);
+
+        $id = $response->json('data.id');
+        $resource = new VideoResource(Video::find($id));
+        $this->assertResource($response, $resource);
     }
 
     public function testInvalidationRequired()
@@ -149,10 +206,10 @@ class VideoControllerTest extends TestCase
         $response = $this->assertStore($this->sendData + [
             'categories_id' => [$this->category->id], 'genres_id' => [$this->genre->id]
             ], $this->sendData + ['deleted_at' => null]);
-        $response->assertJsonStructure(['created_at', 'updated_at']);
+        $response->assertJsonStructure(['data' => $this->serializedFields]);
 
         $this->assertDatabaseHasRelation('category_video',
-            ['video_id' => $response->json('id'), 'category_id' => $this->category->id]);
+            ['video_id' => $response->json('data.id'), 'category_id' => $this->category->id]);
     }
 
     public function testUpdate()
@@ -160,9 +217,9 @@ class VideoControllerTest extends TestCase
         $response = $this->assertUpdate($this->sendData +
             ['opened' => true, 'categories_id' => [$this->category->id], 'genres_id' => [$this->genre->id]],
             $this->sendData + ['opened' => true]);
-        $response->assertJsonStructure(['created_at', 'updated_at']);
+        $response->assertJsonStructure(['data' => $this->serializedFields]);
         $this->assertDatabaseHasRelation('genre_video',
-            ['video_id' => $response->json('id'), 'genre_id' => $this->genre->id]);
+            ['video_id' => $response->json('data.id'), 'genre_id' => $this->genre->id]);
     }
 
     public function testDestroy()
@@ -234,7 +291,7 @@ class VideoControllerTest extends TestCase
         );
         $response->assertStatus(201);
 
-        $id = $response->json('id');
+        $id = $response->json('data.id');
         \Storage::assertExists("{$id}/{$video->hashName()}");
         \Storage::assertExists("{$id}/{$thumb->hashName()}");
         \Storage::assertExists("{$id}/{$banner->hashName()}");
@@ -263,24 +320,19 @@ class VideoControllerTest extends TestCase
         );
         $response->assertStatus(200);
 
-        $fields = [
-            'thumb_file' => UploadedFile::fake()->create("thumb_file.jpg"),
-            'video_file' => UploadedFile::fake()->create("video_file.mp4"),
-            'categories_id' => [$this->category->id],
-            'genres_id' => [$this->genre->id]
-        ];
+
 
         $response = $this->json(
             'PUT', $this->routeUpdate(), $this->sendData + $fields
         );
 
         $response->assertStatus(200);
-
         $id = $response->json('data.id');
-        \Storage::assertMissing("{$id}/{$video->hashName()}");
-        \Storage::assertMissing("{$id}/{$thumb->hashName()}");
-        \Storage::assertMissing("{$id}/{$banner->hashName()}");
-        \Storage::assertMissing("{$id}/{$trailer->hashName()}");
+
+        \Storage::assertExists("{$id}/{$video->hashName()}");
+        \Storage::assertExists("{$id}/{$thumb->hashName()}");
+        \Storage::assertExists("{$id}/{$banner->hashName()}");
+        \Storage::assertExists("{$id}/{$trailer->hashName()}");
     }
 
 
