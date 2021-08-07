@@ -4,7 +4,8 @@
 namespace Tests\Traits;
 
 
-use Illuminate\Testing\TestResponse;
+use Illuminate\Foundation\Testing\TestResponse;
+
 
 trait TestValidations
 {
